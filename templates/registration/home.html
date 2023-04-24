@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+  <h1>Welcome, {{ user.username }}!</h1>
+  <div class="row">
+    <div class="col-md-6">
+      <h2>Start Interview</h2>
+      <form id="interview-form">
+        {% csrf_token %}
+        <button type="button" class="btn btn-primary" id="start-btn">Start Recording</button>
+        <button type="button" class="btn btn-danger" id="stop-btn" disabled>Stop Recording</button>
+      </form>
+      <hr>
+      <h3>Speech-to-Text Result</h3>
+      <textarea class="form-control" id="result" rows="5" readonly></textarea>
+    </div>
+  </div>
+    <div id="prompt-suggestion"></div>
+
+  <script>
+    alert("JS script")
+    const startBtn = document.querySelector('#start-btn');
+    const stopBtn = document.querySelector('#stop-btn');
+    const result = document.querySelector('#result');
+    let recognition;
+
+    startBtn.addEventListener('click', () => {
+      recognition = new webkitSpeechRecognition();
+      recognition.onstart = () => {
+        result.value = '';
+        result.placeholder = 'Recording started...';
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+      };
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        result.value += text;
+      };
+      recognition.onend = () => {
+        result.placeholder = 'Recording finished.';
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      };
+      recognition.start();
+    });
+
+    stopBtn.addEventListener('click', () => {
+      recognition.stop();
+    });
+  </script>
+{% endblock %}
+

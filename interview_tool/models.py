@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from wordbank_manager.models import Prompt
 
 class Interview(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -12,7 +11,6 @@ class Interview(models.Model):
 
 class Response(models.Model):
     interview = models.ForeignKey(Interview, on_delete=models.CASCADE)
-    prompt = models.ForeignKey(Prompt, on_delete=models.CASCADE)
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 

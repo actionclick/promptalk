@@ -1,0 +1,26 @@
+{% load bootstrap4 %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{% block title %}{% endblock %}</title>
+  {% bootstrap_css %}
+</head>
+<body>
+  <nav>
+    <ul>
+      <li><a href="{% url 'login' %}">Login</a></li>
+      <li><a href="{% url 'prompt_list' %}">Maintenance</a></li>
+      <li><a href="#">Support</a></li>
+      <li><a href="#">About Us</a></li>
+      {% if user.is_authenticated %}
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      {% else %}
+        <li><a href="{% url 'login' %}">Login</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% block content %}
+  {% endblock %}
+  {% bootstrap_javascript jquery='full' %}
+</body>
+</html>

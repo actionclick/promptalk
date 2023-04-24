@@ -16,9 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from interview_tool import views
+
+app_name = 'interview'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('prompt_list/', views.prompt_list_view, name='prompt_list'),
+    path('home/', views.home_view, name='home'),
+    path('start/', views.start_interview, name='start'),
 ]
 
 from django.urls import include
