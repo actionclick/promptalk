@@ -27,6 +27,7 @@ urlpatterns = [
     path('prompt_list/', views.prompt_list_view, name='prompt_list'),
     path('home/', views.home_view, name='home'),
     path('start/', views.start_interview, name='start'),
+    path('get-prompt-suggestion/', views.get_prompt_suggestion, name='get_prompt_suggestion'),
 ]
 
 from django.urls import include

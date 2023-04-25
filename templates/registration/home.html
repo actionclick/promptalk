@@ -6,48 +6,84 @@
   <div class="row">
     <div class="col-md-6">
       <h2>Start Interview</h2>
+
       <form id="interview-form">
         {% csrf_token %}
-        <button type="button" class="btn btn-primary" id="start-btn">Start Recording</button>
-        <button type="button" class="btn btn-danger" id="stop-btn" disabled>Stop Recording</button>
+        <button type="button" class="btn btn-primary" id="start-button">Start Recording</button>
+        <button type="button" class="btn btn-danger" id="stop-button" disabled>Stop Recording</button>
       </form>
       <hr>
       <h3>Speech-to-Text Result</h3>
       <textarea class="form-control" id="result" rows="5" readonly></textarea>
     </div>
+    <div id="prompt-suggestion"><h2>Suggestion</h2></div>
   </div>
-    <div id="prompt-suggestion"></div>
 
-  <script>
-    alert("JS script")
-    const startBtn = document.querySelector('#start-btn');
-    const stopBtn = document.querySelector('#stop-btn');
-    const result = document.querySelector('#result');
-    let recognition;
+    <script>
+        // Get the start and stop buttons
+        var startButton = document.getElementById("start-button");
+        var stopButton = document.getElementById("stop-button");
 
-    startBtn.addEventListener('click', () => {
-      recognition = new webkitSpeechRecognition();
-      recognition.onstart = () => {
-        result.value = '';
-        result.placeholder = 'Recording started...';
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-      };
-      recognition.onresult = (event) => {
-        const text = event.results[0][0].transcript;
-        result.value += text;
-      };
-      recognition.onend = () => {
-        result.placeholder = 'Recording finished.';
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-      };
-      recognition.start();
-    });
+        // Add event listeners to the buttons
+        startButton.addEventListener("click", startRecording);
+        stopButton.addEventListener("click", stopRecording);
 
-    stopBtn.addEventListener('click', () => {
-      recognition.stop();
-    });
-  </script>
+        var final_transcript = '';
+        var recognizing = false;
+        var recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = function() {
+            recognizing = true;
+        };
+
+        recognition.onerror = function(event) {
+            console.error(event.error);
+        };
+
+        recognition.onend = function() {
+            recognizing = false;
+        };
+
+        recognition.onresult = function(event) {
+            var interim_transcript = '';
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    final_transcript += event.results[i][0].transcript;
+                    document.getElementById('result').value = final_transcript;
+                    searchPrompt(final_transcript);
+                } else {
+                    interim_transcript += event.results[i][0].transcript;
+                }
+            }
+        };
+
+        function startRecording() {
+            if (recognizing) {
+                recognition.stop();
+                return;
+            }
+            final_transcript = '';
+            document.getElementById('result').value = 'Recording...';
+            document.getElementById("stop-button").disabled = false;
+
+            recognition.start();
+        }
+
+        function searchPrompt(transcript) {
+            var hashtags = transcript.match(/#[^\s]+/g);
+            if (hashtags != null) {
+            }
+        }
+
+        function stopRecording() {
+            recognition.stop();
+            document.getElementById("stop-button").disabled = true;
+            document.getElementById("start-button").disabled = false;
+            console.log('Recording stopped');
+        }
+    </script>
 {% endblock %}
 
