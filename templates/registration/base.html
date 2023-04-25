@@ -11,8 +11,6 @@
     <ul>
       <li><a href="{% url 'login' %}">Login</a></li>
       <li><a href="{% url 'prompt_list' %}">Maintenance</a></li>
-      <li><a href="#">Support</a></li>
-      <li><a href="#">About Us</a></li>
       {% if user.is_authenticated %}
         <li><a href="{% url 'logout' %}">Logout</a></li>
       {% else %}

@@ -49,18 +49,22 @@ def searchPrompt(request):
         # remove unimportant words
         relevant_words = remove_stop_words(transcript)
         print(relevant_words)
-        words = relevant_words.split()
+        word_list = relevant_words.split()
 
         # Search for a prompt in the database using the cleaned transcript.
         try:
-            prompt = StandardPrompt.objects.filter(hashtags__icontains=transcript).first()
-            if prompt:
-                response = prompt.text
-            else:
-                response = ""
+            response_text = ""
+            for word in word_list:
+                prompt_list = StandardPrompt.objects.filter(hashtags__icontains=word)
+                for prompt in prompt_list:
+                    if prompt:
+                        response_text += prompt.text
+                        response_text += "\n"
+                    else:
+                        response_text = ""
         except StandardPrompt.DoesNotExist:
             response = ""
-        return JsonResponse({'response': response})
+        return JsonResponse({'response': response_text})
     else:
         return JsonResponse({'error': 'Invalid request method.'})
 
