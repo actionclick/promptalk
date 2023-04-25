@@ -16,7 +16,10 @@
       <h3>Speech-to-Text Result</h3>
       <textarea class="form-control" id="result" rows="5" readonly></textarea>
     </div>
-    <div id="prompt-suggestion"><h2>Suggestion</h2></div>
+
+    <div class="col-md-6"><h2>Suggestion</h2>
+      <textarea class="form-control" id="response" rows="5" readonly></textarea>
+    </div>
   </div>
 
     <script>
@@ -56,6 +59,8 @@
                     searchPrompt(final_transcript);
                 } else {
                     interim_transcript += event.results[i][0].transcript;
+                    document.getElementById('result').value = interim_transcript
+                    searchPrompt(interim_transcript);
                 }
             }
         };
@@ -73,9 +78,23 @@
         }
 
         function searchPrompt(transcript) {
-            var hashtags = transcript.match(/#[^\s]+/g);
-            if (hashtags != null) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+              // The server has responded with a response.
+              // You can use the response to update the UI or perform other actions.
+              var responseTextArea = document.getElementById("response");
+              var response = JSON.parse(this.responseText)
+              responseTextArea.value += response.response;
             }
+          };
+          var csrftoken = getCookie('csrftoken');
+          xhttp.open("POST", "/search_prompt/", true);
+          xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+          xhttp.send("transcript=" + transcript);
+
+
         }
 
         function stopRecording() {
@@ -83,6 +102,22 @@
             document.getElementById("stop-button").disabled = true;
             document.getElementById("start-button").disabled = false;
             console.log('Recording stopped');
+        }
+
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
     </script>
 {% endblock %}
