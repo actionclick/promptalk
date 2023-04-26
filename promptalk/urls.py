@@ -28,7 +28,6 @@ urlpatterns = [
     path('home/', views.home_view, name='home'),
     path('start/', views.start_interview, name='start'),
     path('search_prompt/', views.searchPrompt, name='searchPrompt'),
-
 ]
 
 from django.urls import include

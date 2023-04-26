@@ -11,6 +11,9 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
+displayed_prompts = set()
+displayed_user_prompts = set()
+
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -45,7 +48,7 @@ def start_interview(request):
 def searchPrompt(request):
     if request.method == 'POST':
         transcript = request.POST.get('transcript')
-
+        user_id = request.user.id
         # remove unimportant words
         relevant_words = remove_stop_words(transcript)
         print(relevant_words)
@@ -54,17 +57,28 @@ def searchPrompt(request):
         # Search for a prompt in the database using the cleaned transcript.
         try:
             response_text = ""
+            response_user_text = ""
             for word in word_list:
-                prompt_list = StandardPrompt.objects.filter(hashtags__icontains=word)
+                prompt_list = StandardPrompt.objects.filter(hashtags__icontains=word).exclude(id__in=displayed_prompts)
+                prompt_list_user = UserPrompt.objects.filter(hashtags__icontains=word).filter(user_id=user_id).exclude(id__in=displayed_user_prompts)
                 for prompt in prompt_list:
                     if prompt:
+                        displayed_prompts.add(prompt.id)
                         response_text += prompt.text
                         response_text += "\n"
                     else:
+
                         response_text = ""
+                for prompt_user in prompt_list_user:
+                    if prompt_user:
+                        displayed_user_prompts.add(prompt_user.id)
+                        response_user_text += prompt_user.text
+                        response_user_text += "\n"
+                    else:
+                        response_user_text = ""
         except StandardPrompt.DoesNotExist:
-            response = ""
-        return JsonResponse({'response': response_text})
+            response_text = ""
+        return JsonResponse({'response': response_text, 'response_user': response_user_text})
     else:
         return JsonResponse({'error': 'Invalid request method.'})
 

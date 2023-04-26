@@ -2,10 +2,10 @@
 
 
 {% block content %}
-  <h2>Welcome, {{ user.username }}!</h2>
+  <h4>Welcome, {{ user.username }}!</h4>
   <div class="row">
-    <div class="col-md-9">
-      <h2>Start Interview</h2>
+    <div class="col-md-10">
+      <h5>Start Interview</h5>
 
       <form id="interview-form">
         {% csrf_token %}
@@ -13,10 +13,12 @@
         <button type="button" class="btn btn-danger" id="stop-button" disabled>Stop Recording</button>
       </form>
       <hr>
-      <h3>Speech-to-Text Result</h3>
+      <h5>Speech-to-Text Result</h5>
       <textarea class="form-control" id="result" rows="5" readonly></textarea>
-      <h3>Suggestion</h3>
+      <h5>Standard Suggestion</h5>
       <textarea class="form-control" id="response" rows="5" readonly></textarea>
+      <h5>Customize Suggestion</h5>
+      <textarea class="form-control" id="response_user" rows="5" readonly></textarea>
     </div>
 
     <div class="col-md-6">
@@ -88,6 +90,8 @@
               var responseTextArea = document.getElementById("response");
               var response = JSON.parse(this.responseText)
               responseTextArea.value += response.response;
+              var responseTextAreaUser = document.getElementById("response_user");
+              responseTextAreaUser.value += response.response_user;
             }
           };
           var csrftoken = getCookie('csrftoken');
@@ -95,9 +99,8 @@
           xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
           xhttp.setRequestHeader("X-CSRFToken", csrftoken);
           xhttp.send("transcript=" + transcript);
-
-
         }
+
 
         function stopRecording() {
             recognition.stop();
